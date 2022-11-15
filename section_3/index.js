@@ -2,7 +2,7 @@ const vertexString = `
   attribute vec4 a_position;
   uniform mat4 proj;
   void main() {
-    gl_Position = proj * a_position;
+    gl_Position = a_position;
     gl_PointSize = 60.0;
   }
 `;
@@ -18,7 +18,6 @@ const points = [];
 let webgl = null;
 
 init();
-handleWebglClick();
 /**
  * 入口函数
  */
@@ -66,9 +65,33 @@ function initShader() {
  * 数据缓存区函数
  */
 function initBuffer() {
-  const pointPosition = new Float32Array(points.flat());
   const aPosition = webgl.getAttribLocation(webgl.program, "a_position");
-  webgl.vertexAttrib4fv(aPosition, pointPosition);
+
+  webglDiv.addEventListener("click", function (e) {
+    const x = e.clientX;
+    const y = e.clientY;
+    const rect = e.target.getBoundingClientRect();
+    const top = rect.top;
+    const left = rect.left;
+    const xRadius = webglDiv.clientWidth / 2;
+    const yRadius = webglDiv.clientHeight / 2;
+    const pointX = (x - left - xRadius) / xRadius;
+    const pointY = -(y - top - yRadius) / yRadius;
+    // const item = [x, y, 0.0, 1.0];
+    points.push(pointX);
+    points.push(pointY);
+    points.push(0);
+    points.push(1.0);
+    console.log("points", points);
+    const pointPosition = new Float32Array(points);
+    const pointBuffer = webgl.createBuffer();
+    webgl.bindBuffer(webgl.ARRAY_BUFFER, pointBuffer);
+    webgl.bufferData(webgl.ARRAY_BUFFER, pointPosition, webgl.STATIC_DRAW);
+    webgl.enableVertexAttribArray(aPosition);
+    webgl.vertexAttribPointer(aPosition, 4, webgl.FLOAT, false, 4 * 4, 0 * 4);
+
+    draw();
+  });
 
   const uniformProj = webgl.getUniformLocation(webgl.program, "proj");
   webgl.uniformMatrix4fv(uniformProj, false, projMat4);
@@ -80,18 +103,5 @@ function initBuffer() {
 function draw() {
   webgl.clearColor(0.0, 0.0, 0.0, 1);
   webgl.clear(webgl.COLOR_BUFFER_BIT);
-  webgl.drawArrays(webgl.POINTS, 0, points.length);
-}
-
-function handleWebglClick() {
-  webglDiv.onclick = function (e) {
-    const clientX = e.clientX;
-    const clientY = e.clientY;
-    console.log(clientX, clientY);
-    const item = [clientX, clientY, 0.0, 1.0];
-    points.push(item);
-
-    initBuffer();
-    draw();
-  };
+  points.length && webgl.drawArrays(webgl.POINTS, 0, points.length);
 }
