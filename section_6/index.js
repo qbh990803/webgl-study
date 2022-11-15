@@ -81,15 +81,23 @@ function initBuffer() {
 
   const pointPosition = new Float32Array(arr.flat());
 
+  // 创建缓冲区对象
   const lineBuffer = webgl.createBuffer();
+  // 绑定缓冲区对象
   webgl.bindBuffer(webgl.ARRAY_BUFFER, lineBuffer);
+  // 顶点数组data数据传入缓冲区
   webgl.bufferData(webgl.ARRAY_BUFFER, pointPosition, webgl.STATIC_DRAW);
+  // 允许数据传递
   webgl.enableVertexAttribArray(aPosition);
+  // 缓冲区数据按照一定的规律传递给位置变量aPosition
   webgl.vertexAttribPointer(aPosition, 4, webgl.FLOAT, false, 4 * 4, 0 * 4);
 
   const indexArr = new Uint16Array(arrIndex.flat());
+  // 创建缓冲区对象
   const indexBuffer = webgl.createBuffer();
+  // 绑定缓冲区对象
   webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  // 索引数组indexes传入缓冲区
   webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, indexArr, webgl.STATIC_DRAW);
   const uniformProj = webgl.getUniformLocation(webgl.program, "proj");
   webgl.uniformMatrix4fv(uniformProj, false, projMat4);
