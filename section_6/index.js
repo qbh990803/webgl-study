@@ -52,11 +52,29 @@ function initShader() {
   webgl.compileShader(vsShader);
   webgl.compileShader(fsShader);
 
+  if (!webgl.getShaderParameter(vsShader, webgl.COMPLICE_STATUS)) {
+    const err = webgl.getShaderInfoLog(vsShader);
+    alert(err);
+    return;
+  }
+  if (!webgl.getShaderParameter(fsShader, webgl.COMPLICE_STATUS)) {
+    const err = webgl.getShaderInfoLog(fsShader);
+    alert(err);
+    return;
+  }
+
   const program = webgl.createProgram();
   webgl.attachShader(program, vsShader);
   webgl.attachShader(program, fsShader);
 
   webgl.linkProgram(program);
+
+  if (webgl.getProgramParameter(program, webgl.LINK_STATUS)) {
+    const err = webgl.getProgramInfoLog(program);
+    alert(err);
+    return;
+  }
+
   webgl.useProgram(program);
   webgl.program = program;
 }
